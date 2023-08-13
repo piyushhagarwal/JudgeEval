@@ -25,4 +25,5 @@ CREATE TABLE scores (
     FOREIGN KEY (judge_id) REFERENCES judges(judge_id),
     FOREIGN KEY (team_id) REFERENCES teams(team_id),
     FOREIGN KEY (parameter_id) REFERENCES parameters(parameter_id)
+    
 );
