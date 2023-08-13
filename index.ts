@@ -5,12 +5,14 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 import JudgeRouter from "./routes/judge";
+import TeamRouter from "./routes/teams";
 
 app.use(express.json());
 
 //Routes
 
 app.use("/api/v1/judge", JudgeRouter);
+app.use("/api/v1/teams", TeamRouter);
 
 const start = async () => {
   try {
