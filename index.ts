@@ -4,9 +4,13 @@ import queryDatabase from "./database/connection";
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.get("/", (req, res) => {
-  res.send("Hello, TypeScript Express App!");
-});
+import JudgeRouter from "./routes/judge";
+
+app.use(express.json());
+
+//Routes
+
+app.use("/api/v1/judge", JudgeRouter);
 
 const start = async () => {
   try {
