@@ -19,7 +19,7 @@ router.post("/", createTeam);
 router.get("/:id", getTeamDetails);
 
 // Route to update details of a specific team
-router.put("/:id", updateTeam);
+router.patch("/:id", updateTeam);
 
 // Route to delete a Team
 router.delete("/:id", deleteTeam);

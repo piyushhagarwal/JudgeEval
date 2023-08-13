@@ -45,32 +45,42 @@ export const getTeamDetails = async (req: Request, res: Response) => {
 };
 
 export const updateTeam = async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const { name, members } = req.body;
-
   try {
-    const query =
-      "UPDATE teams SET name = $1, members = $2 WHERE id = $3 RETURNING *";
-    const updatedTeam = queryDatabase(query, [name, members, id]);
+    const teamId = req.params.id;
+    const { team_name, other_team_details } = req.body;
 
-    if (updatedTeam) {
-      res.json(updatedTeam);
-    } else {
-      res.status(404).send("Team not found");
+    const query = `
+        UPDATE teams
+        SET team_name = COALESCE($1, team_name), other_team_details = COALESCE($2, other_team_details)
+        WHERE team_id = $3
+        RETURNING *;
+      `;
+    //The COALESCE function is used in the UPDATE query to conditionally update only the non-null values passed in the request. This means if a value is provided in the request body, it will be updated, otherwise, the existing value will be retained.
+
+    const values = [team_name, other_team_details, teamId];
+
+    const updatedTeam = await queryDatabase(query, values);
+
+    if (updatedTeam.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Team not found" });
     }
+
+    res.status(200).json({ updatedTeam: updatedTeam[0], success: true });
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Error updating team details");
+    console.error("Error updating team:", error);
+    res.status(500).json({ error, success: false });
   }
 };
 
 export const deleteTeam = async (req: Request, res: Response) => {
   try {
-    const teamId = req.params.id; // Assuming the judge ID is passed as a parameter
+    const teamId = req.params.id;
 
     const query = `
         DELETE FROM teams
-        WHERE judge_id = $1
+        WHERE team_id = $1
         RETURNING *;
       `;
 
@@ -81,12 +91,12 @@ export const deleteTeam = async (req: Request, res: Response) => {
     if (deletedTeam.length === 0) {
       return res
         .status(404)
-        .json({ success: false, message: "Judge not found" });
+        .json({ success: false, message: "Team not found" });
     }
 
-    res.status(200).json({ judge: deletedTeam[0], success: true });
+    res.status(200).json({ deletedTeam: deletedTeam[0], success: true });
   } catch (error) {
-    console.error("Error deleting judge:", error);
+    console.error("Error deleting Team:", error);
     res.status(500).json({ error, success: false });
   }
 };
