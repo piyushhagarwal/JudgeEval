@@ -1,13 +1,24 @@
-import pgPromise from 'pg-promise';
-import { IDatabase } from 'pg-promise';
-// import config from '../config/config'; // Load database configuration
+import { Client } from "pg";
 
-// Create a PostgreSQL database connection
-const pgp = pgPromise();
+async function queryDatabase(query: string, params: any[] = []): Promise<any> {
+  const client = new Client({
+    user: "myuser",
+    host: "localhost",
+    database: "mydb",
+    password: "mypassword",
+    port: 5432,
+  });
 
-export function connectDatabase(): IDatabase<{}> {
-    const db: IDatabase<{}> = pgp('postgres://myuser:mypassword@localhost:5432/mydb');
-    return db;
+  try {
+    await client.connect();
+    const result = await client.query(query, params);
+    return result.rows;
+  } catch (error) {
+    console.error("Error executing query:", error);
+    throw error;
+  } finally {
+    await client.end();
+  }
 }
 
-
+export default queryDatabase;
