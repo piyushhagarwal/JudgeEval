@@ -1,3 +1,5 @@
+import * as dotenv from "dotenv";
+dotenv.config(); // Load environment variables from .env file
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
@@ -6,7 +8,7 @@ interface DecodedToken {
   // Add more properties as needed
 }
 
-const JWT_SECRET = "oursecret";
+const JWT_SECRET = process.env.JWT_SECRET || "default_secret"; // Provide a default value because ts is giving error as jwt.verify() is not able to identify the type of JWT_SECRET
 
 const fetchJudge = async (req: Request, res: Response, next: NextFunction) => {
   const token = req.header("auth-token");

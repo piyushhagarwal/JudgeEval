@@ -17,13 +17,12 @@ CREATE TABLE parameters (
 );
 
 CREATE TABLE scores (
-    score_id INTEGER PRIMARY KEY,
+    score_id SERIAL PRIMARY KEY,
     judge_id INTEGER,
     team_id INTEGER,
     parameter_id INTEGER,
     score_value INTEGER,
     FOREIGN KEY (judge_id) REFERENCES judges(judge_id),
     FOREIGN KEY (team_id) REFERENCES teams(team_id),
-    FOREIGN KEY (parameter_id) REFERENCES parameters(parameter_id)
-    
+    FOREIGN KEY (parameter_id) REFERENCES parameters(parameter_id)   
 );

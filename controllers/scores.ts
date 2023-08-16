@@ -18,7 +18,6 @@ export const score = async (req: Request, res: Response) => {
 
     res.status(201).json({ newScore: newScore[0], success: true });
   } catch (error) {
-    console.error("Error creating parameter:", error);
-    res.status(500).json({ error, success: false });
+    res.status(500).json({ message: "Error adding score:", success: false });
   }
 };
