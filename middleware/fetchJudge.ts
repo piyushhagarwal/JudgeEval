@@ -3,11 +3,10 @@ import jwt from "jsonwebtoken";
 
 interface DecodedToken {
   judgeId: string;
-  judgeName: string;
   // Add more properties as needed
 }
 
-const secretToken = "oursecret";
+const JWT_SECRET = "oursecret";
 
 function fetchJudge() {
   return (req: Request, res: Response, next: NextFunction) => {
@@ -18,13 +17,12 @@ function fetchJudge() {
     }
 
     try {
-      const decodedToken = jwt.verify(token, secretToken) as DecodedToken;
+      const decodedToken = jwt.verify(token, JWT_SECRET) as DecodedToken;
 
-      const { judgeId, judgeName } = decodedToken;
+      const { judgeId } = decodedToken;
 
       // Set the judge details in the request headers for further processing
       req.headers.judgeId = judgeId;
-      req.headers.judgeName = judgeName;
 
       // Proceed to the next middleware or route handler
       next();
