@@ -7,7 +7,9 @@ interface DecodedToken {
   // Add more properties as needed
 }
 
-function fetchJudge(secretKey: string) {
+const secretToken = "oursecret";
+
+function fetchJudge() {
   return (req: Request, res: Response, next: NextFunction) => {
     const token = req.header("auth-token");
 
@@ -16,7 +18,7 @@ function fetchJudge(secretKey: string) {
     }
 
     try {
-      const decodedToken = jwt.verify(token, secretKey) as DecodedToken;
+      const decodedToken = jwt.verify(token, secretToken) as DecodedToken;
 
       const { judgeId, judgeName } = decodedToken;
 
