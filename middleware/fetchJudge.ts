@@ -2,34 +2,32 @@ import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
 interface DecodedToken {
-  judgeId: string;
+  judge_id: string;
   // Add more properties as needed
 }
 
 const JWT_SECRET = "oursecret";
 
-function fetchJudge() {
-  return (req: Request, res: Response, next: NextFunction) => {
-    const token = req.header("auth-token");
+const fetchJudge = async (req: Request, res: Response, next: NextFunction) => {
+  const token = req.header("auth-token");
 
-    if (!token) {
-      return res.status(401).json({ message: "Token missing" });
-    }
+  if (!token) {
+    return res.status(401).json({ message: "Token missing" });
+  }
 
-    try {
-      const decodedToken = jwt.verify(token, JWT_SECRET) as DecodedToken;
+  try {
+    const decodedToken = jwt.verify(token, JWT_SECRET) as DecodedToken;
 
-      const { judgeId } = decodedToken;
+    const { judge_id } = decodedToken;
 
-      // Set the judge details in the request headers for further processing
-      req.headers.judgeId = judgeId;
+    // Set the judge details in the request headers for further processing
+    req.headers.judge_id = judge_id;
 
-      // Proceed to the next middleware or route handler
-      next();
-    } catch (error) {
-      return res.status(401).json({ message: "Invalid token" });
-    }
-  };
-}
+    // Proceed to the next middleware or route handler
+    next();
+  } catch (error) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+};
 
 export default fetchJudge;

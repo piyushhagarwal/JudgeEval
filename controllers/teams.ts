@@ -4,7 +4,7 @@ import queryDatabase from "../database/connection";
 export const getAllTeams = async (req: Request, res: Response) => {
   try {
     const teams = await queryDatabase("SELECT * FROM teams");
-    res.render("teams", { teams });
+    res.json(teams);
   } catch (error) {
     console.error(error);
     res.status(500).send("Error fetching teams");
@@ -12,12 +12,12 @@ export const getAllTeams = async (req: Request, res: Response) => {
 };
 
 export const createTeam = async (req: Request, res: Response) => {
-  const { name, members } = req.body;
+  const { team_name, other_team_details } = req.body;
 
   try {
     const query =
-      "INSERT INTO teams (name, members) VALUES ($1, $2) RETURNING *";
-    const newTeam = await queryDatabase(query, [name, members]);
+      "INSERT INTO teams (team_name, other_team_details) VALUES ($1, $2) RETURNING *";
+    const newTeam = await queryDatabase(query, [team_name, other_team_details]);
 
     res.status(201).json(newTeam);
   } catch (error) {
