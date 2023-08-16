@@ -4,25 +4,29 @@ import queryDatabase from "../database/connection";
 export const getAllTeams = async (req: Request, res: Response) => {
   try {
     const teams = await queryDatabase("SELECT * FROM teams");
-    res.render("teams", { teams });
+    res.status(200).json({ teams, success: true });
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Error fetching teams");
+    res.status(500).json({ message: "Error fetching teams", success: false });
   }
 };
 
 export const createTeam = async (req: Request, res: Response) => {
-  const { name, members } = req.body;
+  const { team_name, other_team_details } = req.body;
 
   try {
-    const query =
-      "INSERT INTO teams (name, members) VALUES ($1, $2) RETURNING *";
-    const newTeam = await queryDatabase(query, [name, members]);
+    const query = `
+      INSERT INTO teams
+      (team_name, other_team_details)
+      VALUES ($1, $2)
+      RETURNING *;
+    `;
+    const newTeam = await queryDatabase(query, [team_name, other_team_details]);
 
-    res.status(201).json(newTeam);
+    res.status(201).json({ newTeam, success: true });
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Error creating a new team");
+    res
+      .status(500)
+      .json({ message: "Error creating a new team", success: false });
   }
 };
 
@@ -34,13 +38,14 @@ export const getTeamDetails = async (req: Request, res: Response) => {
     const team = await queryDatabase(query, [id]);
 
     if (team) {
-      res.json(team);
+      res.status(200).json({ team: team[0], success: true });
     } else {
-      res.status(404).send("Team not found");
+      res.status(404).json({ message: "Team not found", success: false });
     }
   } catch (error) {
-    console.error(error);
-    res.status(500).send("Error fetching team details");
+    res
+      .status(500)
+      .json({ message: "Error fetching team details", success: false });
   }
 };
 
@@ -69,8 +74,7 @@ export const updateTeam = async (req: Request, res: Response) => {
 
     res.status(200).json({ updatedTeam: updatedTeam[0], success: true });
   } catch (error) {
-    console.error("Error updating team:", error);
-    res.status(500).json({ error, success: false });
+    res.status(500).json({ message: "Error updating team:", success: false });
   }
 };
 
@@ -96,7 +100,6 @@ export const deleteTeam = async (req: Request, res: Response) => {
 
     res.status(200).json({ deletedTeam: deletedTeam[0], success: true });
   } catch (error) {
-    console.error("Error deleting Team:", error);
-    res.status(500).json({ error, success: false });
+    res.status(500).json({ message: "Error deleting Team:", success: false });
   }
 };

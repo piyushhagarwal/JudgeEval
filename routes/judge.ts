@@ -11,7 +11,8 @@ import {
   deleteJudge,
 } from "../controllers/judge";
 
-router.route("/").post(createJudge).post(loginJudge).get(getAllJudges);
+router.route("/").post(createJudge).get(getAllJudges);
+router.route("/login").post(loginJudge);
 router.route("/:id").get(getSingleJudge).patch(updateJudge).delete(deleteJudge);
 
 export default router;

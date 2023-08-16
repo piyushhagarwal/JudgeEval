@@ -7,13 +7,13 @@ export const getAllParameters = async (req: Request, res: Response) => {
       SELECT *
       FROM parameters;
     `;
-
     const parameters = await queryDatabase(query);
-
     res.status(200).json({ parameters, success: true });
   } catch (error) {
-    console.error("Error fetching parameters:", error);
-    res.status(500).json({ error, success: false });
+    res.status(500).json({
+      message: "There was an error in fetching all parameters",
+      success: false,
+    });
   }
 };
 
@@ -35,8 +35,9 @@ export const getSingleParameter = async (req: Request, res: Response) => {
       res.status(200).json({ parameter: parameter[0], success: true });
     }
   } catch (error) {
-    console.error("Error fetching parameter:", error);
-    res.status(500).json({ error, success: false });
+    res
+      .status(500)
+      .json({ message: "Error while fetching the parameter", success: false });
   }
 };
 
@@ -56,8 +57,10 @@ export const createParameter = async (req: Request, res: Response) => {
 
     res.status(201).json({ newParameter: newParameter[0], success: true });
   } catch (error) {
-    console.error("Error creating parameter:", error);
-    res.status(500).json({ error, success: false });
+    res.status(500).json({
+      message: "Some error occured during creating parameter",
+      success: false,
+    });
   }
 };
 
@@ -86,8 +89,9 @@ export const updateParameter = async (req: Request, res: Response) => {
 
     res.status(200).json({ parameter: updatedParameter[0], success: true });
   } catch (error) {
-    console.error("Error updating parameter:", error);
-    res.status(500).json({ error, success: false });
+    res
+      .status(500)
+      .json({ message: "Error updating the parameter", success: false });
   }
 };
 
@@ -113,7 +117,8 @@ export const deleteParameter = async (req: Request, res: Response) => {
 
     res.status(200).json({ parameter: deletedParameter[0], success: true });
   } catch (error) {
-    console.error("Error deleting parameter:", error);
-    res.status(500).json({ error, success: false });
+    res
+      .status(500)
+      .json({ message: "Error deleting parameter:", success: false });
   }
 };

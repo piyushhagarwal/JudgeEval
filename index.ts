@@ -9,6 +9,8 @@ import TeamRouter from "./routes/teams";
 import ParameterRouter from "./routes/parameters";
 import ScoreRouter from "./routes/score";
 
+import { notFound } from "./middleware/notFound";
+
 app.use(express.json());
 
 //Routes
@@ -17,6 +19,8 @@ app.use("/api/v1/judge", JudgeRouter);
 app.use("/api/v1/team", TeamRouter);
 app.use("/api/v1/parameter", ParameterRouter);
 app.use("/api/v1/score", ScoreRouter);
+
+app.use(notFound);
 
 const start = async () => {
   try {
