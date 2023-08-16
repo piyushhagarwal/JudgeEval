@@ -8,34 +8,35 @@ const JWT_SECRET = "oursecret";
 export const loginJudge = async (req: Request, res: Response) => {
   try {
     const { judge_name, judge_password } = req.body;
-
     const getUserQuery = `
-      SELECT *
+      SELECT * 
       FROM judges
       WHERE judge_name = $1;
     `;
 
-    const retreivedJudge = await queryDatabase(getUserQuery, [judge_name]);
+    let retrieveJudgeArray = await queryDatabase(getUserQuery, [judge_name]);
 
-    if (retreivedJudge.length === 0) {
-      res
+    if (!retrieveJudgeArray || retrieveJudgeArray.length === 0) {
+      return res
         .status(500)
         .json({ error: "Login with correct username", success: false });
     }
 
+    const retrieveJudge = retrieveJudgeArray[0];
+
     const passwordCompare = await bcrypt.compare(
       judge_password,
-      retreivedJudge.judge_password
+      retrieveJudge.judge_password
     );
 
     if (!passwordCompare) {
-      res
+      return res
         .status(500)
         .json({ error: "Login with correct password", success: false });
     }
 
     const payloadData = {
-      judge_id: retreivedJudge.judge_id,
+      judge_id: retrieveJudge.judge_id,
     };
 
     const authToken = jwt.sign(payloadData, JWT_SECRET);
@@ -56,7 +57,7 @@ export const createJudge = async (req: Request, res: Response) => {
       `;
     //if user with same email exists already
     let retrieveJudge = await queryDatabase(getUserQuery, [judge_name]);
-    if (retrieveJudge) {
+    if (retrieveJudge.length !== 0) {
       return res.status(400).json({
         success: false,
         error: "Sorry the judge with the given name already exists",
@@ -64,7 +65,7 @@ export const createJudge = async (req: Request, res: Response) => {
     }
     //Hashing the password using bcrypt
     const salt = await bcrypt.genSalt(10);
-    const securedPassword = await bcrypt.hash(req.body.password, salt);
+    const securedPassword = await bcrypt.hash(judge_password, salt);
 
     const createJudgeQuery = `
       INSERT INTO judges ( judge_name, judge_password)
