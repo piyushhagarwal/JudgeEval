@@ -85,7 +85,7 @@ export const createJudge = async (req: Request, res: Response) => {
 
     //Creating the authentication token by using the id of the judge by JWT
     const payloadData = {
-      judge_id: createdJudge.judge_id,
+      judge_id: createdJudge[0].judge_id,
     };
     const authToken = jwt.sign(payloadData, JWT_SECRET);
     res.status(201).json({ success: true, authToken }); // It means {authToken : authToken}
