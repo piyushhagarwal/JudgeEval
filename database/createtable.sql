@@ -22,7 +22,7 @@ CREATE TABLE scores (
     team_id INTEGER,
     parameter_id INTEGER,
     score_value INTEGER,
-    FOREIGN KEY (judge_id) REFERENCES judges(judge_id),
-    FOREIGN KEY (team_id) REFERENCES teams(team_id),
-    FOREIGN KEY (parameter_id) REFERENCES parameters(parameter_id)   
+    FOREIGN KEY (judge_id) REFERENCES judges(judge_id) ON DELETE CASCADE,
+    FOREIGN KEY (team_id) REFERENCES teams(team_id) ON DELETE CASCADE,
+    FOREIGN KEY (parameter_id) REFERENCES parameters(parameter_id) ON DELETE CASCADE   
 );
