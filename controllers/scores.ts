@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import queryDatabase from "../database/connection";
-//if judge_id,parameter_id and team_id is not present
 
 export const score = async (req: Request, res: Response) => {
   try {
@@ -15,14 +14,54 @@ export const score = async (req: Request, res: Response) => {
       });
     }
 
-    //To prevent adding scores in the database whose judge_id is not present
-    //To prevent adding scores in the database whose parameter_id is not present
-    //To prevent adding scores in the database whose team_id is not present
+    // To prevent adding scores in the database whose judge_id is not present
+    const checkJudgeIdQuery = `
+      SELECT * FROM judges
+      WHERE judge_id = $1;
+    `;
 
-    //To prevent adding duplicate scores in the database
+    const judge = await queryDatabase(checkJudgeIdQuery, [judge_id]);
+
+    if (judge.length == 0 || !judge) {
+      return res
+        .status(500)
+        .json({ message: "Judge does not exists", success: false });
+    }
+
+    //To prevent adding scores in the database whose parameter_id is not present
+    const checkParameterIdQuery = `
+      SELECT * FROM parameters
+      WHERE parameter_id = $1;
+    `;
+
+    const parameter = await queryDatabase(checkParameterIdQuery, [
+      parameter_id,
+    ]);
+
+    if (parameter.length == 0 || !parameter) {
+      return res
+        .status(500)
+        .json({ message: "Parameter does not exists", success: false });
+    }
+
+    //To prevent adding scores in the database whose team_id is not present
+    const checkTeamIdQuery = `
+      SELECT * FROM teams
+      WHERE team_id = $1;
+    `;
+
+    const team = await queryDatabase(checkTeamIdQuery, [team_id]);
+
+    if (team.length == 0 || !team) {
+      return res
+        .status(500)
+        .json({ message: "Team does not exists", success: false });
+    }
+
+    // //To prevent adding duplicate scores in the database
     const alreadyExistQuery = `
-      SELECT * FROM scores 
-      WHERE judge_id = $1 AND team_id = $2 AND parameter_id = $3;  
+      SELECT * FROM scores
+      WHERE judge_id = $1 AND team_id = $2 AND parameter_id = $3;
     `;
 
     const duplicateScore = await queryDatabase(alreadyExistQuery, [
