@@ -8,6 +8,7 @@ import JudgeRouter from "./routes/judge";
 import TeamRouter from "./routes/teams";
 import ParameterRouter from "./routes/parameters";
 import ScoreRouter from "./routes/score";
+import CompetitionRouter from "./routes/competition";
 
 import { notFound } from "./middleware/notFound";
 
@@ -19,6 +20,7 @@ app.use("/api/v1/judge", JudgeRouter);
 app.use("/api/v1/team", TeamRouter);
 app.use("/api/v1/parameter", ParameterRouter);
 app.use("/api/v1/score", ScoreRouter);
+app.use("/api/v1/competition", CompetitionRouter);
 
 app.use(notFound);
 
