@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 
 interface DecodedToken {
   judge_id: string;
+  competition_id: string;
   // Add more properties as needed
 }
 
@@ -20,10 +21,11 @@ const fetchJudge = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const decodedToken = jwt.verify(token, JWT_SECRET) as DecodedToken;
 
-    const { judge_id } = decodedToken;
+    const { judge_id, competition_id } = decodedToken;
 
     // Set the judge details in the request headers for further processing
     req.headers.judge_id = judge_id;
+    req.headers.competition_id = competition_id;
 
     // Proceed to the next middleware or route handler
     next();

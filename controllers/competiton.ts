@@ -88,7 +88,7 @@ export const loginCompetition = async (req: Request, res: Response) => {
         .json({ message: "Login with correct password", success: false });
     }
     const payloadData = {
-      judge_id: retrieveCompetition.competition_id,
+      competition_id: retrieveCompetition.competition_id,
     };
 
     const authToken = jwt.sign(payloadData, JWT_SECRET);

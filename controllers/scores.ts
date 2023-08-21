@@ -5,6 +5,7 @@ export const score = async (req: Request, res: Response) => {
   try {
     const { team_id, parameter_id, score_value } = req.body;
     const judge_id = req.headers.judge_id;
+    const competition_id = req.headers.competition_id;
 
     //To prevent adding scores in the database which have judge_id = NULL
     if (!judge_id) {
@@ -78,12 +79,18 @@ export const score = async (req: Request, res: Response) => {
 
     //Main query to add score
     const query = `
-        INSERT INTO scores ( judge_id, team_id, parameter_id, score_value)
-        VALUES ($1, $2, $3, $4)
+        INSERT INTO scores ( judge_id, team_id, parameter_id, score_value, competition_id)
+        VALUES ($1, $2, $3, $4, $5)
         RETURNING *;
       `;
 
-    const values = [judge_id, team_id, parameter_id, score_value];
+    const values = [
+      judge_id,
+      team_id,
+      parameter_id,
+      score_value,
+      competition_id,
+    ];
 
     const newScore = await queryDatabase(query, values);
 

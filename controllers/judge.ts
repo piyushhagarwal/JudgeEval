@@ -10,6 +10,7 @@ const JWT_SECRET = process.env.JWT_SECRET || "default_secret"; // Provide a defa
 export const loginJudge = async (req: Request, res: Response) => {
   try {
     const { judge_name, judge_password } = req.body;
+
     const getUserQuery = `
       SELECT * 
       FROM judges
@@ -37,8 +38,18 @@ export const loginJudge = async (req: Request, res: Response) => {
         .json({ message: "Login with correct password", success: false });
     }
 
+    const getCompetitionIdQuery = `
+      SELECT competition_id 
+      FROM judges
+      WHERE judge_id = $1
+    `;
+    const competition_id = await queryDatabase(getCompetitionIdQuery, [
+      retrieveJudge.judge_id,
+    ]);
+
     const payloadData = {
       judge_id: retrieveJudge.judge_id,
+      competition_id: competition_id[0].competition_id,
     };
 
     const authToken = jwt.sign(payloadData, JWT_SECRET);
@@ -53,15 +64,24 @@ export const loginJudge = async (req: Request, res: Response) => {
 
 export const createJudge = async (req: Request, res: Response) => {
   try {
+    const { competition_id } = req.headers;
+    if (!competition_id) {
+      return res
+        .status(500)
+        .json({ message: "Competition id not present", success: false });
+    }
     const { judge_name, judge_password } = req.body;
     const getUserQuery = `
       SELECT * 
       FROM judges
-      WHERE judge_name = $1;
+      WHERE judge_name = $1 AND competition_id = $2;
       `;
 
     //if user with same email exists already
-    let retrieveJudge = await queryDatabase(getUserQuery, [judge_name]);
+    let retrieveJudge = await queryDatabase(getUserQuery, [
+      judge_name,
+      competition_id,
+    ]);
     if (retrieveJudge.length !== 0) {
       return res.status(400).json({
         success: false,
@@ -74,18 +94,20 @@ export const createJudge = async (req: Request, res: Response) => {
     const securedPassword = await bcrypt.hash(judge_password, salt);
 
     const createJudgeQuery = `
-      INSERT INTO judges ( judge_name, judge_password)
-      VALUES ($1, $2)
+      INSERT INTO judges ( judge_name, judge_password, competition_id)
+      VALUES ($1, $2, $3)
       RETURNING *;
     `;
     let createdJudge = await queryDatabase(createJudgeQuery, [
       judge_name,
       securedPassword,
+      competition_id,
     ]);
 
     //Creating the authentication token by using the id of the judge by JWT
     const payloadData = {
       judge_id: createdJudge[0].judge_id,
+      competition_id: competition_id,
     };
     const authToken = jwt.sign(payloadData, JWT_SECRET);
     res.status(201).json({ success: true, authToken }); // It means {authToken : authToken}
