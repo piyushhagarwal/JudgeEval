@@ -10,8 +10,10 @@ import {
   updateJudge,
   deleteJudge,
 } from "../controllers/judge";
+import fetchCompetition from "../middleware/fetchCompetition";
 
-router.route("/").post(createJudge).get(getAllJudges);
+router.post("/", fetchCompetition, createJudge);
+router.route("/").get(getAllJudges);
 router.route("/login").post(loginJudge);
 router.route("/:id").get(getSingleJudge).patch(updateJudge).delete(deleteJudge);
 
