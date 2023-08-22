@@ -64,6 +64,24 @@ export const createParameter = async (req: Request, res: Response) => {
         .json({ message: "Competition id not present", success: false });
     }
 
+    //if parameter with same name exists already
+    const getParameterQuery = `
+      SELECT * 
+      FROM parameters
+      WHERE parameter_name = $1 AND competition_id = $2;
+      `;
+
+    let retrieveParameter = await queryDatabase(getParameterQuery, [
+      parameter_name,
+      competition_id,
+    ]);
+    if (retrieveParameter.length !== 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Sorry the parameter with the given name already exists",
+      });
+    }
+
     const query = `
       INSERT INTO parameters ( parameter_name, parameter_description, competition_id)
       VALUES ($1, $2, $3)

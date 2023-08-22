@@ -61,7 +61,7 @@ export const score = async (req: Request, res: Response) => {
 
     //To prevent adding scores in the database whose competition_id is not present
     const checkCompetitionIdQuery = `
-      SELECT * FROM teams
+      SELECT * FROM competitions
       WHERE competition_id = $1;
     `;
 
@@ -69,7 +69,7 @@ export const score = async (req: Request, res: Response) => {
       competition_id,
     ]);
 
-    if (competition.length == 0 || !team) {
+    if (competition.length == 0 || !competition) {
       return res
         .status(500)
         .json({ message: "Competition does not exists", success: false });
@@ -130,12 +130,10 @@ export const getAllScores = async (req: Request, res: Response) => {
       WHERE competition_id = $1;
     `;
 
-    const competitions = await queryDatabase(query, [competition_id]);
+    const scores = await queryDatabase(query, [competition_id]);
 
-    res.status(200).json({ competitions, success: true });
+    res.status(200).json({ scores, success: true });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error fetching Competitions:", success: false });
+    res.status(500).json({ message: "Error fetching scores:", success: false });
   }
 };
