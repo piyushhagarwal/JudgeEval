@@ -4,9 +4,25 @@ import queryDatabase from "./database/connection";
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.get("/", (req, res) => {
-  res.send("Hello, TypeScript Express App!");
-});
+import JudgeRouter from "./routes/judge";
+import TeamRouter from "./routes/teams";
+import ParameterRouter from "./routes/parameters";
+import ScoreRouter from "./routes/score";
+import CompetitionRouter from "./routes/competition";
+
+import { notFound } from "./middleware/notFound";
+
+app.use(express.json());
+
+//Routes
+
+app.use("/api/v1/judge", JudgeRouter);
+app.use("/api/v1/team", TeamRouter);
+app.use("/api/v1/parameter", ParameterRouter);
+app.use("/api/v1/score", ScoreRouter);
+app.use("/api/v1/competition", CompetitionRouter);
+
+app.use(notFound);
 
 const start = async () => {
   try {
