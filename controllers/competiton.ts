@@ -41,10 +41,10 @@ export const createCompetition = async (req: Request, res: Response) => {
     let createdCompetition = await queryDatabase(createCompetitionQuery, [
       competition_name,
       securedPassword,
-    ]);
+    ]); //Return an array
 
     const payloadData = {
-      competition_id: createdCompetition.competition_id,
+      competition_id: createdCompetition[0].competition_id,
     };
     const authToken = jwt.sign(payloadData, JWT_SECRET);
     res.status(201).json({ success: true, authToken });
@@ -60,9 +60,9 @@ export const loginCompetition = async (req: Request, res: Response) => {
   try {
     const { competition_name, competition_password } = req.body;
     const getCompetitionQuery = `
-    SELECT * 
-    FROM competitions
-    WHERE competition_name = $1;
+      SELECT * 
+      FROM competitions
+      WHERE competition_name = $1;
   `;
     let retrieveCompetitionArray = await queryDatabase(getCompetitionQuery, [
       competition_name,
@@ -97,7 +97,7 @@ export const loginCompetition = async (req: Request, res: Response) => {
   } catch (error) {
     res
       .status(500)
-      .json({ message: "Error in loging in the competition", success: false });
+      .json({ message: "Error in logging in the competition", success: false });
   }
 };
 
@@ -115,5 +115,33 @@ export const getAllCompetitions = async (req: Request, res: Response) => {
     res
       .status(500)
       .json({ message: "Error fetching competitions:", success: false });
+  }
+};
+
+export const deleteCompetition = async (req: Request, res: Response) => {
+  try {
+    const competitionId = req.params.id; // Assuming the judge ID is passed as a parameter
+
+    const query = `
+      DELETE FROM competitions
+      WHERE competition_id = $1
+      RETURNING *;
+    `;
+
+    const values = [competitionId];
+
+    const deletedCompetition = await queryDatabase(query, values);
+
+    if (deletedCompetition.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Competition not found" });
+    }
+
+    res.status(200).json({ competition: deletedCompetition[0], success: true });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Error deleting Competition:", success: false });
   }
 };

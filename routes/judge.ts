@@ -13,8 +13,11 @@ import {
 import fetchCompetition from "../middleware/fetchCompetition";
 
 router.post("/", fetchCompetition, createJudge);
-router.route("/").get(getAllJudges);
+router.get("/", fetchCompetition, getAllJudges);
+router.get("/:id", fetchCompetition, getSingleJudge);
+router.delete("/:id", fetchCompetition, deleteJudge);
+router.patch("/:id", fetchCompetition, updateJudge);
+
 router.route("/login").post(loginJudge);
-router.route("/:id").get(getSingleJudge).patch(updateJudge).delete(deleteJudge);
 
 export default router;
