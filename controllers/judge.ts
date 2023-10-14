@@ -71,13 +71,30 @@ export const createJudge = async (req: Request, res: Response) => {
         .json({ message: "Competition id not present", success: false });
     }
     const { judge_name, judge_password } = req.body;
+
+    //To check if competition id is present in the competition table or not
+    const checkCompetitionIdQuery = `
+      SELECT * FROM competitions
+      WHERE competition_id = $1;
+    `;
+
+    const competition = await queryDatabase(checkCompetitionIdQuery, [
+      competition_id,
+    ]);
+
+    if (competition.length == 0 || !competition) {
+      return res
+        .status(500)
+        .json({ message: "Competition does not exists", success: false });
+    }
+
+    //if user with same email exists already
     const getUserQuery = `
       SELECT * 
       FROM judges
       WHERE judge_name = $1 AND competition_id = $2;
       `;
 
-    //if user with same email exists already
     let retrieveJudge = await queryDatabase(getUserQuery, [
       judge_name,
       competition_id,
@@ -121,12 +138,14 @@ export const createJudge = async (req: Request, res: Response) => {
 
 export const getAllJudges = async (req: Request, res: Response) => {
   try {
+    const { competition_id } = req.headers;
     const query = `
       SELECT *
-      FROM judges;
+      FROM judges
+      WHERE competition_id = $1;
     `;
 
-    const judges = await queryDatabase(query);
+    const judges = await queryDatabase(query, [competition_id]);
 
     res.status(200).json({ judges, success: true });
   } catch (error) {
@@ -137,11 +156,12 @@ export const getAllJudges = async (req: Request, res: Response) => {
 export const getSingleJudge = async (req: Request, res: Response) => {
   try {
     const judgeId = req.params.id;
+    const { competition_id } = req.headers;
 
     const query = `
       SELECT *
       FROM judges
-      WHERE judge_id = $1;
+      WHERE judge_id = $1 && competition_id = $2;
     `;
 
     const judge = await queryDatabase(query, [judgeId]);
@@ -188,14 +208,15 @@ export const updateJudge = async (req: Request, res: Response) => {
 export const deleteJudge = async (req: Request, res: Response) => {
   try {
     const judgeId = req.params.id; // Assuming the judge ID is passed as a parameter
+    const { competition_id } = req.headers;
 
     const query = `
       DELETE FROM judges
-      WHERE judge_id = $1
+      WHERE judge_id = $1 AND competition_id = $2
       RETURNING *;
     `;
 
-    const values = [judgeId];
+    const values = [judgeId, competition_id];
 
     const deletedJudge = await queryDatabase(query, values);
 
